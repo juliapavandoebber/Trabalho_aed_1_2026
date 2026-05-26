@@ -7,12 +7,12 @@ typedef struct {
     long topo;   // Primeira posição livre no fim do arquivo
 } CabecalhoMusica;
 
-// Registro da música
 typedef struct {
     int codigo;
     char titulo[44];
     char artista[51];
-    long proximo; // "Ponteiro" (posição no arquivo) para a próxima música
+    int ano;
+    long proximo;
 } Musica;
 
 
