@@ -16,31 +16,18 @@ typedef struct {
     long prox;          // Endereço (posição) da próxima playlist no arquivo 
 } Playlist;
 
-// Abre o arquivo de playlists
+/**
+ * @brief Abre o arquivo binário de controle de playlists no modo especificado.
+ * @pre 'modo' deve ser uma string válida de modo de abertura de arquivo (ex: "rb", "wb+", "rb+").
+ * @pos Retorna o ponteiro FILE* correspondente ao arquivo aberto, ou NULL em caso de erro.
+ */
 FILE* abrir_arquivo_playlist(const char* modo);
 
-// Inicializa o arquivo de playlists criando um cabeçalho vazio se não existir
+/**
+ * @brief Garante a existência do arquivo binário de playlists na inicialização do sistema.
+ * @pre Nenhuma.
+ * @pos Cria o arquivo físico de playlists caso inexistente, gravando o cabeçalho de controle inicial (cabeca = -1, topo = tamanho do cabeçalho)[cite: 109].
+ */
 void iniciar_playlists();
-
-// Escreve o cabeçalho no arquivo de playlists
-void escreve_cabecalho_playlist(FILE* f_playlists, CabecalhoPlaylist* cab);
-
-// Lê o cabeçalho do arquivo de playlists
-CabecalhoPlaylist* le_cabecalho_playlist();
-
-// Escreve uma playlist em uma posição específica do arquivo binário
-void escreve_no_playlist(FILE* f_playlists, Playlist* p, long pos);
-
-// Lê uma playlist de uma posição específica do arquivo binário
-Playlist* le_no_playlist(long pos);
-
-// Cria uma nova playlist no sistema (opção do menu e lote)
-void criarPlaylist(int codigo, const char* titulo);
-
-// Imprime a lista com o código e título de todas as playlists cadastradas
-void listarPlaylists();
-
-// Busca uma playlist pelo seu código e retorna a sua struct/posição
-long buscarPlaylistPorCodigo(int codigo);
 
 #endif
