@@ -8,6 +8,6 @@
 //pre-condicao: 
 //pos-condicao:
 FILE* abrir_arquivo_musica(const char* modo){
-    FILE* f = fopen(ARQUIVO_MUSICAS, modo);
-
+    FILE* f = fopen(ARQUIVO_MUSICA, modo);
+    
 }
