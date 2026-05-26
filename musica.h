@@ -18,14 +18,10 @@ typedef struct {
     long prox;
 } Musica;
 
-<<<<<<< HEAD
 //Abre o arquivo de livros de acordo com o modo desejado
 //pré-condicao: uma string que representa um modo de abertura de arquivo válido (ex: "rb", "wb+", "ab+")
 //pos-condicao: retorna o arquivo aberto no modo desejado
 FILE* abrir_arquivo_livro(const char* modo);
-=======
-
->>>>>>> 6f1dd4e867a00c6876ce8e8c74f54e75a266edb0
 
 /**
  *  Abre o arquivo binário de músicas do acervo no modo especificado.
@@ -111,7 +107,6 @@ void listarmusicas();
  */
 void buscarMusicaPorTitulo(const char *tituloBuscado);
 
-<<<<<<< HEAD
 //Conta quantos musica ja foram inseridos na lista
 //pre-condicao: o arquivo de musica deve existir e esta acessivel
 //pos-condicao: retorna a quantidade de musica cadastrados
@@ -162,14 +157,6 @@ void adicionarMusicaComRegistro(Musica_no* novo);
 //pos-condicao: Retorna 0 para caso nao haja, 1 caso haja e tenha acrescentado exemplares e -1
 //              para caso não tenha modificado nada
 int MesmoMusicaCodigoDiferente (Musica_no* novo);
-=======
-/**
- *  Percorre a lista de músicas contabilizando quantos elementos ela possui atualmente.
- * pre-condicao: O arquivo binário de músicas deve estar acessível.
- * pos-condicao Retorna um valor inteiro representando a quantidade de nós válidos conectados na lista encadeada do acervo.
- */
-int contarTotalmusicas();
->>>>>>> 6f1dd4e867a00c6876ce8e8c74f54e75a266edb0
 
 
 #endif //musica_h

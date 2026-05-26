@@ -5,8 +5,8 @@
 #include "musica.h"
 
 //Abre o arquivo de musicas de acordo com o modo desejado
-//pre-condicao: 
-//pos-condicao:
+//pre-condicao: uma string que representa um modo de abertura de arquivo valido (ex: "rb", "wb+", "ab+")
+//pos-condicao: retorna o arquivo aberto no modo desejado
 FILE* abrir_arquivo_musica(const char* modo){
     FILE* f = fopen(ARQUIVO_MUSICA, modo);
 
@@ -18,6 +18,9 @@ FILE* abrir_arquivo_musica(const char* modo){
     return f;
 }
 
+//verifica se ja foi iniciado/criado o arquivo binario de musicas
+//pre-condicao: nenhuma
+//pos-condicao: criacao do arquivo .bin caso ele ainda nao exista
 void iniciar_musica(){
     FILE* f_musica = fopen(ARQUIVO_MUSICA, "rb+");
     if(f_musica == NULL){
@@ -30,5 +33,21 @@ void iniciar_musica(){
         criar_lista_vazia_musica(f_musica);
     }
     fclose(f_musica);
+}
+
+// cria uma lista nova no arquivo de musicas
+// pre-condicao: arquivo aberto para leitura/escrita
+// pos-condicao: arquivo eh inicializado com uma lista vazia
+void criar_lista_vazia_musica(FILE* f_musica){
+    CabecalhoMusica cab;
+    cab.cabeca = -1;
+    cab.topo = 0;
+
+    escreve_cabecalho_musica(f_musica, &cab);
+}
+
+void_escreve_cabecalho_musica(FILE* f_musica, CabecalhoMusica* cab){
+    fseek(f_musica, 0, SEEK_SET);
+    fwrite(cab, sizeof(CabecalhoMusica), 1, f_musica);
 }
 
