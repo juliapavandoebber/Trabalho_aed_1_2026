@@ -9,5 +9,11 @@
 //pos-condicao:
 FILE* abrir_arquivo_musica(const char* modo){
     FILE* f = fopen(ARQUIVO_MUSICA, modo);
-    
+
+    if(f == NULL){
+        perror("Erro ao abrir o arquivo de musicas");
+        exit(1);
+    }
+
+    return f;
 }
