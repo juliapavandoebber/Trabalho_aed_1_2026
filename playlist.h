@@ -16,6 +16,31 @@ typedef struct {
     long prox;          // Endereço (posição) da próxima playlist no arquivo 
 } Playlist;
 
+// Abre o arquivo de playlists
+FILE* abrir_arquivo_playlist(const char* modo);
 
+// Inicializa o arquivo de playlists criando um cabeçalho vazio se não existir
+void iniciar_playlists();
+
+// Escreve o cabeçalho no arquivo de playlists
+void escreve_cabecalho_playlist(FILE* f_playlists, CabecalhoPlaylist* cab);
+
+// Lê o cabeçalho do arquivo de playlists
+CabecalhoPlaylist* le_cabecalho_playlist();
+
+// Escreve uma playlist em uma posição específica do arquivo binário
+void escreve_no_playlist(FILE* f_playlists, Playlist* p, long pos);
+
+// Lê uma playlist de uma posição específica do arquivo binário
+Playlist* le_no_playlist(long pos);
+
+// Cria uma nova playlist no sistema (opção do menu e lote)
+void criarPlaylist(int codigo, const char* titulo);
+
+// Imprime a lista com o código e título de todas as playlists cadastradas
+void listarPlaylists();
+
+// Busca uma playlist pelo seu código e retorna a sua struct/posição
+long buscarPlaylistPorCodigo(int codigo);
 
 #endif
