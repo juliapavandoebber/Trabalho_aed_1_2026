@@ -1,82 +1,85 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
-
 #include <stdio.h>
 
 #define ARQUIVO_PLAYLIST "playlist.bin"
-#define MAX_TITULO_PLAYLIST 51 // Máximo de 50 caracteres + '\0' 
 
-// Estrutura de cabeçalho do arquivo de playlists (no início do arquivo) [cite: 109]
+// Estrutura de cabeçalho do arquivo de playlists (no início do arquivo)
 typedef struct {
-    long cabeca; // Posição (byte) da primeira playlist do sistema [cite: 109]
-    long topo;   // Primeira posição livre (fim do arquivo) para novas playlists [cite: 109]
+    long cabeca; // Posição (byte) da primeira playlist do sistema
+    long topo;   // Primeira posição livre (fim do arquivo) para novas playlists
 } CabecalhoPlaylist;
 
-// Estrutura do registro de Playlist [cite: 15]
+// Estrutura do registro de Playlist
 typedef struct {
-    int codigo;         // Identificador único da playlist [cite: 16]
-    char titulo[MAX_TITULO_PLAYLIST]; // Título da playlist 
-    long id_faixa_ini;  // Posição (cabeça) da lista encadeada de faixas neste arquivo [cite: 18]
-    long id_faixa_fim;  // Posição (fim) da lista encadeada de faixas neste arquivo [cite: 19]
-    long prox;          // Endereço (posição) da próxima playlist no arquivo [cite: 19]
+    int codigo;                       // Identificador único da playlist
+    char titulo[51]; // Título da playlist
+    long id_faixa_ini;                // Posição (byte) do primeiro nó de faixa desta playlist
+    long id_faixa_fim;                // Posição (byte) do último nó de faixa desta playlist
+    long prox;                        // Posição (byte) da próxima playlist no arquivo
 } Playlist;
 
 /**
- *  Abre o arquivo binário de controle de playlists no modo especificado.
+ * @brief Abre o arquivo binário de controle de playlists no modo especificado.
  * Propósito: Encapsular a abertura do arquivo físico de playlists.
- * Pré-condições: 'modo' deve ser uma string válida de modo de abertura de arquivo (ex: "rb", "rb+").
- * Pós-condições: Retorna o ponteiro FILE* correspondente ao arquivo aberto, ou NULL em caso de erro.
+ * @pre 'modo' deve ser uma string válida de modo de abertura de arquivo (ex: "rb", "rb+").
+ * @pos Retorna o ponteiro FILE* correspondente ao arquivo aberto, ou NULL em caso de erro.
  */
 FILE* abrir_arquivo_playlist(const char* modo);
 
 /**
- *  Garante a existência do arquivo binário de playlists na inicialização do sistema.
- * Propósito: Verificar a presença do arquivo e criar a estrutura inicial se necessário.
- * Pré-condições: Nenhuma.
- * Pós-condições: Cria o arquivo físico de playlists caso inexistente, gravando o cabeçalho de controle inicial (cabeca = -1, topo = tamanho do cabeçalho)[cite: 109].
+ * @brief Escreve ou atualiza o registro de cabeçalho no início do arquivo binário de playlists.
+ * Propósito: Mover o ponteiro do arquivo para o byte 0 e salvar as informações de controle (cabeca e topo).
+ * @pre O arquivo de playlists deve estar aberto em um modo que permita escrita ("rb+" ou "wb+").
+ * @pos O cabeçalho é gravado com sucesso no início do arquivo de playlists.
+ */
+void escreve_cabecalho_playlist(FILE* f_playlist, const CabecalhoPlaylist* cab);
+
+/**
+ * @brief Garante a existência do arquivo binário de playlists na inicialização do sistema.
+ * Propósito: Criar o arquivo de playlists caso não exista, salvando um cabeçalho limpo por padrão.
+ * @pre Nenhuma.
+ * @pos O arquivo físico existirá em disco e conterá um cabeçalho inicial estruturado.
  */
 void iniciar_playlists();
 
 /**
- *  Cria uma nova playlist no arquivo binário.
- * Propósito: Instancia uma estrutura de playlist com os ponteiros de faixa inicializados como vazios (-1) 
- * e a insere no final ou ordenadamente na lista de playlists.
- * Pré-condições: O arquivo binário de playlists deve estar aberto em modo "rb+". O código de playlist fornecido deve ser único.
- * Pós-condições: A nova playlist é persistida no arquivo e o cabeçalho é atualizado.
+ * @brief Cria uma nova playlist no arquivo binário.
+ * Propósito: Instancia uma estrutura de playlist e a insere no final da lista encadeada global de playlists.
+ * @pre O arquivo binário de playlists deve estar aberto em modo "rb+". O código fornecido deve ser único.
+ * @pos A nova playlist é gravada no arquivo e os ponteiros de controle no cabeçalho são atualizados em disco.
  */
 int criar_playlist(FILE *arq_play, int codigo, const char *titulo);
 
 /**
- *  Imprime o código e o título de todas as playlists cadastradas[cite: 31].
- * Propósito: Percorre de forma encadeada o arquivo de playlists exibindo seus dados básicos identificadores[cite: 31].
- * Pré-condições: O arquivo de playlists deve estar aberto em modo "rb".
- * Pós-condições: A lista resumida (código e título) de todas as playlists criadas é impressa na tela[cite: 31].
+ * @brief Imprime o código e o título de todas as playlists cadastradas.
+ * Propósito: Percorrer de forma encadeada o arquivo de playlists imprimindo sequencialmente os dados na tela.
+ * @pre O arquivo de playlists deve estar aberto em modo de leitura ("rb").
+ * @pos A lista com o identificador e título de todas as playlists é gerada no terminal.
  */
 void imprimir_lista_playlists(FILE *arq_play);
 
 /**
- *  Imprime as músicas de uma playlist detalhadamente[cite: 30].
- * Propósito: Localiza a playlist informada, acessa o arquivo de faixas a partir de 'id_faixa_ini' 
- * e, para cada faixa, recupera o nome da música e artista no arquivo de músicas[cite: 30].
- * Pré-condições: Os arquivos de playlists ("rb"), faixas ("rb") e músicas ("rb") devem estar abertos.
- * Pós-condições: Imprime o título da playlist seguido pelos títulos e artistas das músicas associadas, na ordem correta[cite: 30].
+ * @brief Imprime detalhadamente as músicas pertencentes a uma playlist.
+ * Propósito: Localizar a playlist, caminhar pela sua lista encadeada de faixas e buscar no acervo os títulos/artistas.
+ * @pre Os arquivos de playlists ("rb"), faixas ("rb") e músicas ("rb") devem estar abertos.
+ * @pos Imprime o título da playlist seguido de todas as suas músicas na ordem correta de inserção.
  */
 void imprimir_playlist_especifica(FILE *arq_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
 
 /**
- *  Busca interna para localizar uma playlist pelo seu código e retornar sua posição em disco.
- * Propósito: Encontrar uma playlist para leitura ou futura modificação de seus ponteiros de faixas.
- * Pré-condições: O arquivo binário de playlists deve estar aberto.
- * Pós-condições: Retorna 1 se a playlist for encontrada, preenchendo a estrutura 'saida' e guardando em 'pos_offset' 
- * a posição física do registro no arquivo. Retorna 0 caso contrário.
+ * @brief Busca interna para localizar uma playlist pelo código e capturar sua posição física.
+ * Propósito: Obter os dados da playlist e seu offset em bytes para possibilitar atualizações de ponteiros de faixas.
+ * @pre O arquivo binário de playlists deve estar aberto.
+ * @pos Retorna 1 se encontrada (preenchendo 'saida' e 'pos_offset'), ou retorna 0 caso contrário.
  */
 int buscar_playlist_por_codigo(FILE *arq_play, int codigo_playlist, Playlist *saida, long *pos_offset);
 
 /**
- *  Atualiza os dados de uma playlist existente em uma posição específica do arquivo.
- * Propósito: Sobrescrever os dados de uma playlist (geralmente para atualizar id_faixa_ini ou id_faixa_fim).
- * Pré-condições: O arquivo binário de playlists deve estar aberto em modo "rb+". 'pos_offset' deve ser um deslocamento válido em bytes.
- * Pós-condições: O registro da playlist na posição indicada é atualizado com as novas informações em disco.
+ * @brief Atualiza os dados de uma playlist existente em uma posição específica do arquivo.
+ * Propósito: Sobrescrever um registro de playlist em disco após alterações lógicas de ponteiros de faixas.
+ * @pre O arquivo binário de playlists deve estar aberto em modo "rb+". 'pos_offset' deve ser um deslocamento válido.
+ * @pos O registro da playlist é atualizado no arquivo físico com as novas informações.
  */
 void atualizar_playlist(FILE *arq_play, long pos_offset, const Playlist *playlist_atualizada);
 
