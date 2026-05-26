@@ -43,11 +43,6 @@ void criar_lista_vazia_musica(FILE* f_musica){
     cab.cabeca = -1;
     cab.topo = 0;
 
-    escreve_cabecalho_musica(f_musica, &cab);
-}
-
-void_escreve_cabecalho_musica(FILE* f_musica, CabecalhoMusica* cab){
     fseek(f_musica, 0, SEEK_SET);
-    fwrite(cab, sizeof(CabecalhoMusica), 1, f_musica);
+    fwrite(&cab, sizeof(CabecalhoMusica), 1, f_musica);
 }
-
