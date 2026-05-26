@@ -173,7 +173,7 @@ void adicionarMusicaComRegistro(Musica_no* novo);
 //pos-condicao: Retorna 0 para caso nao haja, 1 caso haja e tenha acrescentado exemplares e -1
 //              para caso não tenha modificado nada
 int MesmoMusicaCodigoDiferente (Musica_no* novo);
-=======
+
 void imprimir_playlist_especifica(FILE *arq_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
 
 
