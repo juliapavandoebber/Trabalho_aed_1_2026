@@ -15,7 +15,6 @@ typedef struct {
     char titulo[100];
     char artista[51];
     int ano;
-
     long prox;
 } Musica;
 
@@ -44,7 +43,7 @@ void escreve_cabecalho_musica(FILE* f_musica, const CabecalhoMusica* cab);
 /**
  * @brief Verifica se o arquivo binário de músicas já existe; caso contrário, inicializa-o.
  * @pre Nenhuma.
- * @pos Se o arquivo não existir, ele é criado e um cabeçalho inicial zerado (cabeca = -1, topo = tamanho do cabeçalho) é gravado no início[cite: 109].
+ * @pos Se o arquivo não existir, ele é criado e um cabeçalho inicial zerado (cabeca = -1, topo = tamanho do cabeçalho) é gravado no início.
  */
 void iniciar_musicas();
 
@@ -56,7 +55,7 @@ void iniciar_musicas();
  * O código fornecido não deve existir previamente no acervo.
  * Pós-condições: A música é gravada no arquivo e os ponteiros do cabeçalho são atualizados.
  */
-int cadastrar_musica(FILE *arq, int codigo, const char *titulo, const char *artista, int ano);
+int cadastrar_musica(FILE *f_musica, int codigo, const char *titulo, const char *artista, int ano);
 
 /**
  * @brief Busca e imprime os dados de uma música específica no acervo.
@@ -65,7 +64,7 @@ int cadastrar_musica(FILE *arq, int codigo, const char *titulo, const char *arti
  * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura ("rb").
  * Pós-condições: Os dados da música são exibidos na tela ou uma mensagem de erro é gerada se não encontrada.
  */
-void imprimir_dados_musica(FILE *arq, int codigo);
+void imprimir_dados_musica(FILE *f_musica, int codigo);
 
 /**
  * @brief Lista todas as músicas presentes no acervo geral.
@@ -74,7 +73,7 @@ void imprimir_dados_musica(FILE *arq, int codigo);
  * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura ("rb").
  * Pós-condições: Exibe a lista de todas as músicas cadastradas no terminal.
  */
-void listar_acervo(FILE *arq);
+void listar_acervo(FILE *f_musica);
 
 /**
  * @brief Busca interna para verificar a existência de uma música e retornar seus dados.
@@ -82,7 +81,7 @@ void listar_acervo(FILE *arq);
  * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura ("rb").
  * Pós-condições: Retorna 1 se a música for encontrada e preenche o ponteiro 'saida'; retorna 0 caso contrário.
  */
-int buscar_musica_por_codigo(FILE *arq, int codigo, Musica *saida);
+int buscar_musica_por_codigo(FILE *f_musica, int codigo, Musica *saida);
 
 
 

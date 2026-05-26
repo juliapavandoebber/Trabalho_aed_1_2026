@@ -1,5 +1,6 @@
 #ifndef FAIXA_H
 #define FAIXA_H
+
 #include <stdio.h>
 
 #define ARQUIVO_FAIXA "faixa.bin"
@@ -25,18 +26,26 @@ typedef struct {
 FILE* abrir_arquivo_faixas(const char* modo);
 
 /**
+ * @brief Inicializa o arquivo de faixas com uma estrutura de gerenciamento de espaço vazia.
+ * Propósito: Gravar o cabeçalho inicial configurando a lista de livres como vazia e definindo o topo físico.
+ * @pre O arquivo de faixas deve estar aberto para leitura/escrita e posicionado no início (byte 0).
+ * @pos O arquivo é inicializado com um cabeçalho contendo lista_livres = -1 e topo = sizeof(CabecalhoFaixa).
+ */
+void criar_lista_vazia_faixa(FILE* f_faixas);
+
+/**
  * @brief Escreve ou atualiza o registro de cabeçalho no início do arquivo binário de faixas.
  * Propósito: Posicionar o ponteiro no byte 0 e salvar as variáveis de controle espacial (topo e lista_livres).
  * @pre O arquivo de faixas deve estar aberto em modo que permita escrita ("rb+" ou "wb+").
  * @pos O cabeçalho de faixas é devidamente persistido em disco.
  */
-void escreve_cabecalho_faixa(FILE* f_faixa, const CabecalhoFaixa* cab);
+void escreve_cabecalho_faixa(FILE* f_faixas, const CabecalhoFaixa* cab);
 
 /**
  * @brief Inicializa a estrutura de arquivos de faixas musicais e o gerenciador de espaço vago.
  * Propósito: Garantir que o arquivo exista e possua um cabeçalho de reaproveitamento válido gravado.
  * @pre Nenhuma.
- * @pos Se o arquivo não existir, cria-o e salva o cabeçalho com topo inicial e lista_livres = -1.
+ * @pos Se o arquivo não existir, cria-o e chama a inicialização do cabeçalho de faixas em disco.
  */
 void iniciar_faixas();
 
@@ -44,9 +53,9 @@ void iniciar_faixas();
  * @brief Insere uma música no início de uma playlist específica.
  * Propósito: Aloca um registro de faixa (reaproveitando nós de 'lista_livres' se houver) e o define como o novo 'id_faixa_ini'.
  * @pre Os arquivos de faixas e playlists devem estar abertos em modo "rb+". A música e a playlist devem existir.
- * @pos O nó contendo o código da música é embutido no início da playlist e as alterações são salvas.
+ * @pos Um nó contendo o código da música é embutido no início da playlist e as alterações são salvas.
  */
-int adicionar_faixa_inicio(FILE *arq_faixas, FILE *arq_play, int codigo_playlist, int codigo_musica);
+int adicionar_faixa_inicio(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
 
 /**
  * @brief Insere uma música no final de uma playlist específica.
@@ -54,7 +63,7 @@ int adicionar_faixa_inicio(FILE *arq_faixas, FILE *arq_play, int codigo_playlist
  * @pre Os arquivos de faixas e playlists devem estar abertos em modo "rb+". A música e a playlist devem existir.
  * @pos A música é inserida no final da playlist e o ponteiro 'id_faixa_fim' é sincronizado em disco.
  */
-int adicionar_faixa_fim(FILE *arq_faixas, FILE *arq_play, int codigo_playlist, int codigo_musica);
+int adicionar_faixa_fim(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
 
 /**
  * @brief Remove uma música de uma playlist específica e move o nó físico para a lista de livres.
@@ -62,7 +71,7 @@ int adicionar_faixa_fim(FILE *arq_faixas, FILE *arq_play, int codigo_playlist, i
  * @pre Os arquivos de faixas e playlists devem estar abertos em modo "rb+". A playlist deve conter a música indicada.
  * @pos O nó é removido da playlist e seu endereço é anexado ao cabeçalho para futuro reaproveitamento em novas inserções.
  */
-int remover_faixa(FILE *arq_faixas, FILE *arq_play, int codigo_playlist, int codigo_musica);
+int remover_faixa(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
 
 /**
  * @brief Imprime todas as posições físicas de registros atualmente livres no arquivo de faixas.
@@ -70,6 +79,6 @@ int remover_faixa(FILE *arq_faixas, FILE *arq_play, int codigo_playlist, int cod
  * @pre O arquivo de faixas deve estar aberto em modo de leitura ("rb").
  * @pos Exibe os offsets em bytes de todos os registros que estão atualmente marcados como disponíveis.
  */
-void imprimir_nos_livres(FILE *arq_faixas);
+void imprimir_nos_livres(FILE *f_faixas);
 
 #endif // FAIXA_H
