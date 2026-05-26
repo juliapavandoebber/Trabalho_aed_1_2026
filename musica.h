@@ -12,7 +12,7 @@ typedef struct {
     char titulo[44];
     char artista[51];
     int ano;
-    long proximo;
+    long prox;
 } Musica;
 
 
