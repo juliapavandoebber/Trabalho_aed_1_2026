@@ -11,7 +11,7 @@ typedef struct {
 
 typedef struct {
     int codigo;
-    char titulo[44];
+    char titulo[100];
     char artista[51];
     int ano;
 
@@ -68,32 +68,6 @@ void listar_acervo(FILE *arq);
  */
 int buscar_musica_por_codigo(FILE *arq, int codigo, Musica *saida);
 
-/**
- * @brief Cria uma nova playlist no arquivo binário.
- * * Propósito: Instancia uma estrutura de playlist com os ponteiros de faixa inicializados como vazios (-1)
- * e a insere ordenadamente ou no fim da lista de playlists.
- * Pré-condições: O arquivo binário de playlists deve estar aberto em modo "rb+".
- * O código de playlist fornecido deve ser único.
- * Pós-condições: A nova playlist é persistida no arquivo e o cabeçalho é atualizado.
- */
-int criar_playlist(FILE *arq_play, int codigo, const char *titulo);
-
-/**
- * @brief Imprime o código e o título de todas as playlists.
- * * Propósito: Percorre de forma encadeada o arquivo de playlists exibindo seus dados básicos identificadores.
- * Pré-condições: O arquivo de playlists deve estar aberto em modo "rb".
- * Pós-condições: A lista resumida de todas as playlists criadas é impressa na tela.
- */
-void imprimir_lista_playlists(FILE *arq_play);
-
-/**
- * @brief Imprime as músicas de uma playlist detalhadamente.
- * * Propósito: Localiza a playlist informada, acessa o arquivo de faixas a partir de 'cabeca_faixa'
- * e, para cada faixa, recupera o nome da música e artista no arquivo de músicas.
- * Pré-condições: O arquivo de playlists ("rb"), o de faixas ("rb") e o de músicas ("rb") devem estar abertos.
- * Pós-condições: Imprime o título da playlist seguido pelos títulos e artistas das músicas associadas, na ordem correta.
- */
-void imprimir_playlist_especifica(FILE *arq_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
 
 
 #endif //musica_h
