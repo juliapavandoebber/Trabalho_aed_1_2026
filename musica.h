@@ -18,158 +18,82 @@ typedef struct {
     long prox;
 } Musica;
 
-<<<<<<< HEAD
-//Abre o arquivo de livros de acordo com o modo desejado
-//pré-condicao: uma string que representa um modo de abertura de arquivo válido (ex: "rb", "wb+", "ab+")
-//pos-condicao: retorna o arquivo aberto no modo desejado
-FILE* abrir_arquivo_livro(const char* modo);
-=======
-
->>>>>>> 6f1dd4e867a00c6876ce8e8c74f54e75a266edb0
-
 /**
- *  Abre o arquivo binário de músicas do acervo no modo especificado.
- * pre-condicao: 'modo' deve ser uma string válida de modo de abertura de arquivo em C (ex: "rb", "wb+", "rb+").
- * pos-condicao Retorna um ponteiro FILE* associado ao arquivo físico aberto, ou NULL se houver falha na abertura.
+ * @brief Abre o arquivo binário de músicas do acervo no modo especificado.
+ * @pre 'modo' deve ser uma string válida de modo de abertura de arquivo em C (ex: "rb", "wb+", "rb+").
+ * @pos Retorna um ponteiro FILE* associado ao arquivo físico aberto, ou NULL se houver falha na abertura.
  */
 FILE* abrir_arquivo_musica(const char* modo);
 
 /**
- *  Verifica se o arquivo binário de músicas já existe; caso contrário, inicializa-o.
- * pre-condicao: Nenhuma.
- * pos-condicao Se o arquivo não existir, ele é criado e um cabeçalho inicial zerado (cabeca = -1, topo = tamanho do cabeçalho) é gravado no início[cite: 109].
+ * @brief Verifica se o arquivo binário de músicas já existe; caso contrário, inicializa-o.
+ * @pre Nenhuma.
+ * @pos Se o arquivo não existir, ele é criado e um cabeçalho inicial zerado (cabeca = -1, topo = tamanho do cabeçalho) é gravado no início[cite: 109].
  */
 void iniciar_musicas();
 
 /**
- *  Escreve a estrutura de cabeçalho no início do arquivo binário de músicas.
- * pre-condicao: 'f_musicas' deve ser um ponteiro válido para o arquivo de músicas aberto em modo de escrita/atualização. 'cab' deve apontar para uma estrutura CabecalhoMusica válida.
- * pos-condicao O registro de cabeçalho é persistido na posição 0 (início) do arquivo binário[cite: 109].
+ * @brief Cadastra uma nova música no arquivo binário do acervo geral.
+ * * Propósito: Recebe os dados de uma música, valida se o código é único e insere o registro
+ * no final do arquivo binário (usando o topo do cabeçalho), atualizando os encadeamentos.
+ * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura/escrita ("rb+").
+ * O código fornecido não deve existir previamente no acervo.
+ * Pós-condições: A música é gravada no arquivo e os ponteiros do cabeçalho são atualizados.
  */
-void escreve_cabecalho_musica(FILE* f_musicas, CabecalhoMusica* cab);
+int cadastrar_musica(FILE *arq, int codigo, const char *titulo, const char *artista, int ano);
 
 /**
- *  Lê a estrutura de cabeçalho presente no início do arquivo binário de músicas.
- * pre-condicao: O arquivo binário de músicas deve existir, estar inicializado e acessível para leitura.
- * pos-condicao Retorna um ponteiro alocado dinamicamente contendo os dados do cabeçalho lido do arquivo.
+ * @brief Busca e imprime os dados de uma música específica no acervo.
+ * * Propósito: Percorre a lista encadeada física no arquivo procurando pelo código fornecido.
+ * Se encontrar, imprime código, título, artista e ano no terminal.
+ * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura ("rb").
+ * Pós-condições: Os dados da música são exibidos na tela ou uma mensagem de erro é gerada se não encontrada.
  */
-CabecalhoMusica* le_cabecalho_musica();
+void imprimir_dados_musica(FILE *arq, int codigo);
 
 /**
- *  Escreve um registro de música em uma posição física específica do arquivo binário.
- * pre-condicao: 'f_musicas' deve estar aberto em modo de escrita. 'x' deve ser um ponteiro válido com os dados da música. 'pos' deve ser um deslocamento em bytes ou RRN válido e seguro dentro do arquivo.
- * pos-condicao O registro da música é gravado na posição especificada, sobrescrevendo dados anteriores se houver.
+ * @brief Lista todas as músicas presentes no acervo geral.
+ * * Propósito: Percorre a lista encadeada de músicas a partir da "cabeca" guardada no cabeçalho,
+ * imprimindo sequencialmente todas as músicas salvas.
+ * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura ("rb").
+ * Pós-condições: Exibe a lista de todas as músicas cadastradas no terminal.
  */
-void escreve_no_musica(FILE* f_musicas, Musica* x, long pos);
+void listar_acervo(FILE *arq);
 
 /**
- *  Lê um registro de música de uma posição física específica do arquivo binário.
- * pre-condicao: 'pos' deve ser uma posição (offset em bytes ou RRN) válida de um registro existente dentro do arquivo.
- * pos-condicao Retorna um ponteiro alocado dinamicamente com os dados da música lida daquela posição.
+ * @brief Busca interna para verificar a existência de uma música e retornar seus dados.
+ * * Propósito: Localiza uma música pelo código e preenche uma estrutura em memória para uso das outras entidades.
+ * Pré-condições: O arquivo binário de músicas deve estar aberto em modo de leitura ("rb").
+ * Pós-condições: Retorna 1 se a música for encontrada e preenche o ponteiro 'saida'; retorna 0 caso contrário.
  */
-Musica* le_no_musica(long pos);
+int buscar_musica_por_codigo(FILE *arq, int codigo, Musica *saida);
 
 /**
- *  Interface via menu para coletar dados do terminal e realizar o cadastro de uma nova música no acervo.
- * pre-condicao: Nenhuma (interage com o usuário via prompt de comando)[cite: 35].
- * pos-condicao A música é inserida logicamente em ordem ou no final da lista encadeada do acervo, e o cabeçalho do arquivo é devidamente atualizado[cite: 23, 109].
+ * @brief Cria uma nova playlist no arquivo binário.
+ * * Propósito: Instancia uma estrutura de playlist com os ponteiros de faixa inicializados como vazios (-1)
+ * e a insere ordenadamente ou no fim da lista de playlists.
+ * Pré-condições: O arquivo binário de playlists deve estar aberto em modo "rb+".
+ * O código de playlist fornecido deve ser único.
+ * Pós-condições: A nova playlist é persistida no arquivo e o cabeçalho é atualizado.
  */
-void cadastrarMusica();
+int criar_playlist(FILE *arq_play, int codigo, const char *titulo);
 
 /**
- *  Adiciona diretamente no arquivo binário uma estrutura de música pré-montada (usada no carregamento em lote).
- * pre-condicao: 'novo' deve ser um ponteiro válido para uma struct Musica preenchida com os dados vindos do arquivo de texto[cite: 32, 38].
- * pos-condicao A música é adicionada fisicamente no final do arquivo ('topo'), encadeada na lista geral, e as informações de controle de arquivo são atualizadas[cite: 109].
+ * @brief Imprime o código e o título de todas as playlists.
+ * * Propósito: Percorre de forma encadeada o arquivo de playlists exibindo seus dados básicos identificadores.
+ * Pré-condições: O arquivo de playlists deve estar aberto em modo "rb".
+ * Pós-condições: A lista resumida de todas as playlists criadas é impressa na tela.
  */
-void adicionarMusicaComRegistro(Musica* novo);
+void imprimir_lista_playlists(FILE *arq_play);
 
 /**
- *  Varre o arquivo binário de músicas para verificar se um determinado código já está em uso.
- * pre-condicao: O arquivo binário de músicas deve estar acessível para leitura.
- * pos-condicao Retorna 1 se o código inserido já pertencer a alguma música do acervo, ou 0 caso o código esteja livre para uso[cite: 13].
+ * @brief Imprime as músicas de uma playlist detalhadamente.
+ * * Propósito: Localiza a playlist informada, acessa o arquivo de faixas a partir de 'cabeca_faixa'
+ * e, para cada faixa, recupera o nome da música e artista no arquivo de músicas.
+ * Pré-condições: O arquivo de playlists ("rb"), o de faixas ("rb") e o de músicas ("rb") devem estar abertos.
+ * Pós-condições: Imprime o título da playlist seguido pelos títulos e artistas das músicas associadas, na ordem correta.
  */
-int verifica_cod_musica(int codigo);
-
-/**
- *  Busca uma música pelo código e imprime seus detalhes na tela.
- * pre-condicao: O código fornecido deve ser buscado no arquivo binário de músicas.
- * pos-condicao Se encontrada, imprime no console o código, título, artista e ano da música; caso contrário, exibe mensagem informando que a música não existe[cite: 24].
- */
-void imprimirMusica(int codigo);
-
-/**
- *  Percorre toda a lista encadeada do acervo de músicas no arquivo binário, imprimindo-as em formato de listagem.
- * pre-condicao: O arquivo binário de músicas deve estar inicializado e com registros.
- * pos-condicao Imprime na tela os dados estruturados de todas as músicas que pertencem à lista encadeada do acervo[cite: 25].
- */
-void listarmusicas();
-
-/**
- *  Busca por ocorrências de músicas no acervo que possuam o título exatamente igual ou semelhante ao informado.
- * pre-condicao: 'tituloBuscado' deve ser uma string de caracteres válida.
- * pos-condicao Imprime os dados de todas as músicas cujo título corresponda ao parâmetro de busca, ou informa que nenhuma foi encontrada.
- */
-void buscarMusicaPorTitulo(const char *tituloBuscado);
-
-<<<<<<< HEAD
-//Conta quantos musica ja foram inseridos na lista
-//pre-condicao: o arquivo de musica deve existir e esta acessivel
-//pos-condicao: retorna a quantidade de musica cadastrados
-int contarTotalmusica();
-
-//mostra os dados do Musica
-//pre-condicao: O ponteiro Musica deve apontar para uma estrutura no valida
-//pos-condicao: imprime dados do Musica
-void imprimirDetalhesMusica(Musica_no* Musica);
-
-//Conta quantos titulos de musica ja foram inseridos na lista
-//pre-condicao: o arquivo de musica deve existir e esta acessivel
-//pos-condicao: retorna a quantidade de titulos cadastrados
-int contarTitulosCadastrado();
-
-//verifica se o codigo usado para o cadastro ja foi utilizado
-
-//pre-condicao: numero utilizado para cadastro de livro
-//pos-condicao: Retorna 1 se o código já está em uso por um livro, ou 0 caso contrário
-int verifica_cod_livro (int codigo);
-
-// Adiciona um livro lido de um arquivo de texto ao arquivo binário.
-// pre-condicao: Um ponteiro válido para uma struct Livro_no (novo) contendo os dados do livro.
-//               O arquivo binário de livros (ARQUIVO_LIVROS) deve estar acessível para leitura e escrita.
-// pos-condicao: O novo livro é escrito no final do arquivo binário e o cabeçalho é atualizado.
-void adicionarLivroComRegistro(Livro_no* novo);
-
-//Verifica se ja há um livro com os mesmos dados mas com codigos diferentes
-//pre-condicao: Arquivo livro deve existir e ser acessivel
-//              Um ponteiro válido para uma struct Livro_no (novo) contendo os dados do livro.
-//pos-condicao: Retorna 0 para caso nao haja, 1 caso haja e tenha acrescentado exemplares e -1
-//              para caso não tenha modificado nada
-int MesmoLivroCodigoDiferente (Livro_no* novo);
-
-//pre-condicao: numero utilizado para cadastro de Musica
-//pos-condicao: Retorna 1 se o código já está em uso por um Musica, ou 0 caso contrário
-int verifica_cod_Musica (int codigo);
-
-// Adiciona um Musica lido de um arquivo de texto ao arquivo binário.
-// pre-condicao: Um ponteiro válido para uma struct Musica_no (novo) contendo os dados do Musica.
-//               O arquivo binário de musica (ARQUIVO_musica) deve estar acessível para leitura e escrita.
-// pos-condicao: O novo Musica é escrito no final do arquivo binário e o cabeçalho é atualizado.
-void adicionarMusicaComRegistro(Musica_no* novo);
-
-//Verifica se ja há um Musica com os mesmos dados mas com codigos diferentes
-//pre-condicao: Arquivo Musica deve existir e ser acessivel
-//              Um ponteiro válido para uma struct Musica_no (novo) contendo os dados do Musica.
-//pos-condicao: Retorna 0 para caso nao haja, 1 caso haja e tenha acrescentado exemplares e -1
-//              para caso não tenha modificado nada
-int MesmoMusicaCodigoDiferente (Musica_no* novo);
-=======
-/**
- *  Percorre a lista de músicas contabilizando quantos elementos ela possui atualmente.
- * pre-condicao: O arquivo binário de músicas deve estar acessível.
- * pos-condicao Retorna um valor inteiro representando a quantidade de nós válidos conectados na lista encadeada do acervo.
- */
-int contarTotalmusicas();
->>>>>>> 6f1dd4e867a00c6876ce8e8c74f54e75a266edb0
+void imprimir_playlist_especifica(FILE *arq_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
 
 
 #endif //musica_h
