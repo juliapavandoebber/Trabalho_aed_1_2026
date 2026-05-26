@@ -11,21 +11,19 @@ typedef struct {
 
 typedef struct {
     int codigo;
-    char titulo[44];
+    char titulo[100];
     char artista[51];
     int ano;
 
     long prox;
 } Musica;
 
-<<<<<<< HEAD
+
 //Abre o arquivo de livros de acordo com o modo desejado
 //pré-condicao: uma string que representa um modo de abertura de arquivo válido (ex: "rb", "wb+", "ab+")
 //pos-condicao: retorna o arquivo aberto no modo desejado
 FILE* abrir_arquivo_livro(const char* modo);
 
-=======
->>>>>>> 20b1a492227e9154ea43ea56a04b60bee97f1c54
 /**
  * @brief Abre o arquivo binário de músicas do acervo no modo especificado.
  * @pre 'modo' deve ser uma string válida de modo de abertura de arquivo em C (ex: "rb", "wb+", "rb+").
@@ -76,6 +74,7 @@ void listar_acervo(FILE *arq);
  */
 int buscar_musica_por_codigo(FILE *arq, int codigo, Musica *saida);
 
+
 /**
  * @brief Cria uma nova playlist no arquivo binário.
  * * Propósito: Instancia uma estrutura de playlist com os ponteiros de faixa inicializados como vazios (-1)
@@ -101,7 +100,6 @@ void imprimir_lista_playlists(FILE *arq_play);
  * Pré-condições: O arquivo de playlists ("rb"), o de faixas ("rb") e o de músicas ("rb") devem estar abertos.
  * Pós-condições: Imprime o título da playlist seguido pelos títulos e artistas das músicas associadas, na ordem correta.
  */
-<<<<<<< HEAD
 int verifica_cod_musica(int codigo);
 
 /**
@@ -177,7 +175,7 @@ void adicionarMusicaComRegistro(Musica_no* novo);
 int MesmoMusicaCodigoDiferente (Musica_no* novo);
 =======
 void imprimir_playlist_especifica(FILE *arq_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
->>>>>>> 20b1a492227e9154ea43ea56a04b60bee97f1c54
+
 
 
 #endif //musica_h
