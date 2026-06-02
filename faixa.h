@@ -37,21 +37,6 @@ void iniciar_faixas();
 // pos-condicao: grava uma nova struct com o codigo da musica, atualiza o cabecalho de faixas e retorna o offset do local alocado
 long alocar_faixa(FILE *f_faixas, int codigo_musica);
 
-// Adiciona uma música do acervo geral no início da lista de faixas de uma playlist específica
-// pre-condicao: os arquivos de faixas, playlists e musicas devem estar abertos em modo de leitura/escrita ("rb+") e as entidades devem existir
-// pos-condicao: aloca um no de faixa (reaproveitando ou criando no fim) e o conecta no inicio da playlist, atualizando os arquivos em disco
-void adicionar_faixa_inicio(FILE *f_faixas, FILE *f_play, FILE *f_musicas, int codigo_playlist, int codigo_musica);
-
-// Adiciona uma música do acervo geral no final da lista de faixas de uma playlist específica
-// pre-condicao: os arquivos de faixas, playlists e musicas devem estar abertos em modo de leitura/escrita ("rb+") e as entidades devem existir
-// pos-condicao: aloca um no de faixa (reaproveitando ou criando no fim) e o conecta no fim da playlist, atualizando os arquivos em disco
-void adicionar_faixa_fim(FILE *f_faixas, FILE *f_play, FILE *f_musicas, int codigo_playlist, int codigo_musica);
-
-// Remove uma música de uma playlist específica e move o nó físico para a lista de livres
-// pre-condicao: os arquivos de faixas e playlists devem estar abertos em modo de leitura/escrita ("rb+") e a playlist deve conter a musica indicada
-// pos-condicao: o no eh desconectado da playlist e seu endereco fisico (offset) eh inserido na pilha de nos livres para futuro reuso
-int remover_faixa(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
-
 // Imprime todas as posições físicas de registros atualmente livres no arquivo de faixas
 // pre-condicao: arquivo aberto em modo de leitura ("rb")
 // pos-condicao: percorre a lista encadeada a partir de lista_livres e exibe no terminal os offsets em bytes de todos os espacos disponiveis
