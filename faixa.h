@@ -17,68 +17,44 @@ typedef struct {
     long prox;          // Posição (byte) da próxima faixa pertencente a esta playlist
 } FaixaPlaylist;
 
-/**
- * @brief Abre o arquivo binário responsável por armazenar os nós de faixas das playlists.
- * Propósito: Encapsular a abertura do arquivo físico de faixas.
- * @pre 'modo' deve conter uma string válida de abertura de arquivos em C (ex: "rb", "rb+").
- * @pos Retorna o ponteiro FILE* associado ao arquivo de faixas aberto, ou NULL em caso de erro.
- */
+// Abre o arquivo binário responsável por armazenar os nós de faixas das playlists
+// pre-condicao: uma string que representa um modo de abertura de arquivo valido (ex: "rb", "wb+", "rb+")
+// pos-condicao: retorna o arquivo aberto no modo desejado
 FILE* abrir_arquivo_faixas(const char* modo);
 
-/**
- * @brief Inicializa o arquivo de faixas com uma estrutura de gerenciamento de espaço vazia.
- * Propósito: Gravar o cabeçalho inicial configurando a lista de livres como vazia e definindo o topo físico.
- * @pre O arquivo de faixas deve estar aberto para leitura/escrita e posicionado no início (byte 0).
- * @pos O arquivo é inicializado com um cabeçalho contendo lista_livres = -1 e topo = sizeof(CabecalhoFaixa).
- */
+// cria uma lista nova no arquivo de faixas
+// pre-condicao: arquivo aberto para leitura/escrita
+// pos-condicao: arquivo eh inicializado com um cabecalho contendo lista_livres = -1 e topo = tamanho do cabecalho
 void criar_lista_vazia_faixa(FILE* f_faixas);
 
-/**
- * @brief Escreve ou atualiza o registro de cabeçalho no início do arquivo binário de faixas.
- * Propósito: Posicionar o ponteiro no byte 0 e salvar as variáveis de controle espacial (topo e lista_livres).
- * @pre O arquivo de faixas deve estar aberto em modo que permita escrita ("rb+" ou "wb+").
- * @pos O cabeçalho de faixas é devidamente persistido em disco.
- */
-void escreve_cabecalho_faixa(FILE* f_faixas, const CabecalhoFaixa* cab);
-
-/**
- * @brief Inicializa a estrutura de arquivos de faixas musicais e o gerenciador de espaço vago.
- * Propósito: Garantir que o arquivo exista e possua um cabeçalho de reaproveitamento válido gravado.
- * @pre Nenhuma.
- * @pos Se o arquivo não existir, cria-o e chama a inicialização do cabeçalho de faixas em disco.
- */
+// verifica se ja foi iniciado/criado o arquivo binario de faixas
+// pre-condicao: nenhuma
+// pos-condicao: criacao do arquivo .bin caso ele ainda nao exista, chamando a inicializacao do cabecalho limpo
 void iniciar_faixas();
 
-/**
- * @brief Insere uma música no início de uma playlist específica.
- * Propósito: Aloca um registro de faixa (reaproveitando nós de 'lista_livres' se houver) e o define como o novo 'id_faixa_ini'.
- * @pre Os arquivos de faixas e playlists devem estar abertos em modo "rb+". A música e a playlist devem existir.
- * @pos Um nó contendo o código da música é embutido no início da playlist e as alterações são salvas.
- */
-int adicionar_faixa_inicio(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
+// Gerencia o espaço físico em disco retirando um nó da lista de livres ou expandindo o topo do arquivo
+// pre-condicao: arquivo aberto em modo de leitura/escrita ("rb+")
+// pos-condicao: grava uma nova struct com o codigo da musica, atualiza o cabecalho de faixas e retorna o offset do local alocado
+long alocar_faixa(FILE *f_faixas, int codigo_musica);
 
-/**
- * @brief Insere uma música no final de uma playlist específica.
- * Propósito: Aloca um registro de faixa (com reaproveitamento de espaço livre se disponível) e o anexa usando o 'id_faixa_fim'.
- * @pre Os arquivos de faixas e playlists devem estar abertos em modo "rb+". A música e a playlist devem existir.
- * @pos A música é inserida no final da playlist e o ponteiro 'id_faixa_fim' é sincronizado em disco.
- */
-int adicionar_faixa_fim(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
+// Adiciona uma música do acervo geral no início da lista de faixas de uma playlist específica
+// pre-condicao: os arquivos de faixas, playlists e musicas devem estar abertos em modo de leitura/escrita ("rb+") e as entidades devem existir
+// pos-condicao: aloca um no de faixa (reaproveitando ou criando no fim) e o conecta no inicio da playlist, atualizando os arquivos em disco
+void adicionar_faixa_inicio(FILE *f_faixas, FILE *f_play, FILE *f_musicas, int codigo_playlist, int codigo_musica);
 
-/**
- * @brief Remove uma música de uma playlist específica e move o nó físico para a lista de livres.
- * Propósito: Desconectar logicamente o nó de faixa da playlist e adicioná-lo na pilha de registros disponíveis ('lista_livres').
- * @pre Os arquivos de faixas e playlists devem estar abertos em modo "rb+". A playlist deve conter a música indicada.
- * @pos O nó é removido da playlist e seu endereço é anexado ao cabeçalho para futuro reaproveitamento em novas inserções.
- */
+// Adiciona uma música do acervo geral no final da lista de faixas de uma playlist específica
+// pre-condicao: os arquivos de faixas, playlists e musicas devem estar abertos em modo de leitura/escrita ("rb+") e as entidades devem existir
+// pos-condicao: aloca um no de faixa (reaproveitando ou criando no fim) e o conecta no fim da playlist, atualizando os arquivos em disco
+void adicionar_faixa_fim(FILE *f_faixas, FILE *f_play, FILE *f_musicas, int codigo_playlist, int codigo_musica);
+
+// Remove uma música de uma playlist específica e move o nó físico para a lista de livres
+// pre-condicao: os arquivos de faixas e playlists devem estar abertos em modo de leitura/escrita ("rb+") e a playlist deve conter a musica indicada
+// pos-condicao: o no eh desconectado da playlist e seu endereco fisico (offset) eh inserido na pilha de nos livres para futuro reuso
 int remover_faixa(FILE *f_faixas, FILE *f_play, int codigo_playlist, int codigo_musica);
 
-/**
- * @brief Imprime todas as posições físicas de registros atualmente livres no arquivo de faixas.
- * Propósito: Percorrer a lista ligada de nós apagados a partir de 'lista_livres' para monitoramento do reuso de espaço.
- * @pre O arquivo de faixas deve estar aberto em modo de leitura ("rb").
- * @pos Exibe os offsets em bytes de todos os registros que estão atualmente marcados como disponíveis.
- */
+// Imprime todas as posições físicas de registros atualmente livres no arquivo de faixas
+// pre-condicao: arquivo aberto em modo de leitura ("rb")
+// pos-condicao: percorre a lista encadeada a partir de lista_livres e exibe no terminal os offsets em bytes de todos os espacos disponiveis
 void imprimir_nos_livres(FILE *f_faixas);
 
 #endif // FAIXA_H
