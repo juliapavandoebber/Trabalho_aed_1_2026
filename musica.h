@@ -33,10 +33,18 @@ void criar_lista_vazia_musica(FILE* f_musica);
 // pos-condicao: criacao do arquivo .bin caso ele ainda nao exista
 void iniciar_musicas();
 
+// Leitura e escrita do cabecalho
+CabecalhoMusica ler_cabecalho_musica(FILE *f_musica);
+void escrever_cabecalho_musica(FILE *f_musica, CabecalhoMusica cab);
+
+// Leitura e escrita de registros
+Musica ler_musica(FILE *f_musica, long pos);
+void escrever_musica(FILE *f_musica, long pos, Musica m);
+
 // Cadastra uma nova música no arquivo binário do acervo geral
 // pre-condicao: arquivo aberto em modo de leitura/escrita ("rb+") e o codigo fornecido nao deve existir previamente no acervo
 // pos-condicao: a musica eh gravada no final do arquivo (topo) e inserida na lista encadeada, atualizando o cabecalho em disco
-void cadastrar_musica(FILE *f_musica, int codigo, const char *titulo, const char *artista, int ano);
+void cadastrar_musica(FILE *f_musica, Musica m);
 
 // Busca e imprime os dados de uma música específica no acervo seguindo a lista encadeada
 // pre-condicao: arquivo aberto para leitura
