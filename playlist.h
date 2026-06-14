@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #define ARQUIVO_PLAYLIST "playlist.bin"
+#define NULO -1
 
 // Estrutura de cabeçalho do arquivo de playlists (no início do arquivo)
 typedef struct {
@@ -20,54 +21,74 @@ typedef struct {
     long prox;                        // Posição (byte) da próxima playlist no arquivo
 } Playlist;
 
-// Abre o arquivo binário de controle de playlists no modo especificado
-// pre-condicao: uma string que representa um modo de abertura de arquivo valido (ex: "rb", "wb+", "rb+")
+// Abre o arquivo binário de playlists no modo especificado
+// pre-condicao: uma string que representa um modo de abertura de arquivo valido
 // pos-condicao: retorna o arquivo aberto no modo desejado
 FILE* abrir_arquivo_playlist(const char* modo);
 
-// cria uma lista nova no arquivo de playlists
+// Cria uma lista vazia no arquivo de playlists
 // pre-condicao: arquivo aberto para leitura/escrita
-// pos-condicao: arquivo eh inicializado com uma lista vazia e cabecalho estruturado (cabeca = -1, topo = tamanho do cabecalho)
+// pos-condicao: arquivo inicializado com cabecalho vazio
 void criar_lista_vazia_playlist(FILE* f_play);
 
-// verifica se ja foi iniciado/criado o arquivo binario de playlists
+// Verifica se o arquivo de playlists existe e o inicializa caso necessario
 // pre-condicao: nenhuma
-// pos-condicao: criacao do arquivo .bin caso ele ainda nao exista, chamando a inicializacao do cabecalho limpo
+// pos-condicao: arquivo binario criado e inicializado caso nao exista
 void iniciar_playlists();
 
+// Le o cabecalho do arquivo de playlists
+// pre-condicao: arquivo aberto para leitura
+// pos-condicao: retorna uma copia do cabecalho armazenado no arquivo
+CabecalhoPlaylist ler_cabecalho_playlist(FILE *f_play);
+
+// Escreve o cabecalho do arquivo de playlists
+// pre-condicao: arquivo aberto para escrita
+// pos-condicao: cabecalho atualizado no arquivo
+void escrever_cabecalho_playlist(FILE *f_play, CabecalhoPlaylist cab);
+
+// Le uma playlist de uma posicao especifica do arquivo
+// pre-condicao: arquivo aberto para leitura e posicao valida
+// pos-condicao: retorna a playlist armazenada na posicao informada
+Playlist ler_playlist(FILE *f_play, long pos);
+
+// Escreve uma playlist em uma posicao especifica do arquivo
+// pre-condicao: arquivo aberto para escrita e posicao valida
+// pos-condicao: playlist gravada na posicao informada
+void escrever_playlist(FILE *f_play, long pos, Playlist p);
+
 // Cria uma nova playlist no arquivo binário de playlists
-// pre-condicao: arquivo aberto em modo de leitura/escrita ("rb+") e o codigo fornecido deve ser unico
-// pos-condicao: a nova playlist eh gravada no final do arquivo (topo) e inserida na lista encadeada global, atualizando o cabecalho em disco
+// pre-condicao: arquivo aberto em modo leitura/escrita e codigo unico
+// pos-condicao: playlist inserida na lista encadeada e cabecalho atualizado
 int criar_playlist(FILE *f_play, int codigo, const char *titulo);
 
-// Imprime o código e o título de todas as playlists cadastradas seguindo o encadeamento
-// pre-condicao: arquivo aberto para leitura
-// pos-condicao: exibe a listagem com o identificador e o titulo de todas as playlists no terminal
-void imprimir_lista_playlists(FILE *f_play);
-
-// Imprime detalhadamente o título e as músicas pertencentes a uma playlist específica
-// pre-condicao: os arquivos de playlists, faixas e musicas devem estar abertos em modo de leitura
-// pos-condicao: exibe os dados da playlist seguidos de todas as suas musicas na ordem correta de insercao
-void imprimir_playlist_especifica(FILE *f_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
-
-// Localiza uma playlist pelo código e captura seus dados e sua posição física no arquivo
-// pre-condicao: arquivo aberto para leitura e ponteiro 'saida' valido
-// pos-condicao: retorna 1 se encontrada preenchendo a estrutura 'saida' e o offset em 'pos_offset', ou retorna 0 caso contrario
+// Localiza uma playlist pelo codigo
+// pre-condicao: arquivo aberto para leitura e ponteiros validos
+// pos-condicao: retorna 1 se encontrada e preenche os parametros de saida, ou 0 caso contrario
 int buscar_playlist_por_codigo(FILE *f_play, int codigo_playlist, Playlist *saida, long *pos_offset);
 
-// Adiciona uma música do acervo geral no início da lista de faixas de uma playlist específica
-// pre-condicao: os arquivos de playlists, faixas e musicas devem estar abertos em modo de leitura/escrita ("rb+") e as entidades devem existir
-// pos-condicao: uma nova faixa eh alocada e conectada na cabeca da sublista da playlist informada, atualizando os ponteiros em disco
+// Imprime todas as playlists cadastradas
+// pre-condicao: arquivo aberto para leitura
+// pos-condicao: exibe codigo e titulo de todas as playlists
+void imprimir_lista_playlists(FILE *f_play);
+
+// Imprime uma playlist especifica e suas musicas
+// pre-condicao: arquivos abertos para leitura e playlist existente
+// pos-condicao: exibe os dados da playlist e suas musicas
+void imprimir_playlist_especifica(FILE *f_play, FILE *arq_faixas, FILE *arq_musicas, int codigo_playlist);
+
+// Adiciona uma musica no inicio da playlist
+// pre-condicao: arquivos abertos para leitura/escrita e entidades existentes
+// pos-condicao: musica inserida no inicio da lista de faixas da playlist
 void adicionar_na_playlist_inicio(FILE *f_play, FILE *f_faixas, FILE *f_musicas, int codigo_playlist, int codigo_musica);
 
-// Adiciona uma música do acervo geral no final da lista de faixas de uma playlist específica
-// pre-condicao: os arquivos de playlists, faixas e musicas devem estar abertos em modo de leitura/escrita ("rb+") e as entidades devem existir
-// pos-condicao: uma nova faixa eh alocada e conectada no fim da sublista da playlist informada, atualizando o ponteiro 'id_faixa_fim' em disco
+// Adiciona uma musica no final da playlist
+// pre-condicao: arquivos abertos para leitura/escrita e entidades existentes
+// pos-condicao: musica inserida no final da lista de faixas da playlist
 void adicionar_na_playlist_fim(FILE *f_play, FILE *f_faixas, FILE *f_musicas, int codigo_playlist, int codigo_musica);
 
-// Remove uma determinada música da lista de faixas de uma playlist específica
-// pre-condicao: os arquivos de playlists e faixas devem estar abertos em modo de leitura/escrita ("rb+") e a playlist deve conter a musica indicada
-// pos-condicao: o no da faixa eh desconectado da playlist e seu endereco eh enviado para a lista de nos livres do arquivo de faixas
+// Remove uma musica da playlist
+// pre-condicao: arquivos abertos para leitura/escrita e musica pertencente a playlist
+// pos-condicao: musica removida da playlist e no enviado para lista de livres
 void remover_da_playlist(FILE *f_playlist, FILE *f_faixa, int codigo_playlist, int codigo_musica);
 
-#endif // PLAYLIST_H
+#endif

@@ -2,6 +2,7 @@
 #define MUSICA_H
 
 #define ARQUIVO_MUSICA "musica.bin"
+#define NULO -1
 #include <stdio.h>
 
 // Cabeçalho do arquivo binário de músicas
@@ -31,7 +32,7 @@ void criar_lista_vazia_musica(FILE* f_musica);
 // verifica se ja foi iniciado/criado o arquivo binario de musicas
 // pre-condicao: nenhuma
 // pos-condicao: criacao do arquivo .bin caso ele ainda nao exista
-void iniciar_musicas();
+void iniciar_musica();
 
 // Leitura e escrita do cabecalho
 CabecalhoMusica ler_cabecalho_musica(FILE *f_musica);
@@ -42,7 +43,7 @@ Musica ler_musica(FILE *f_musica, long pos);
 void escrever_musica(FILE *f_musica, long pos, Musica m);
 
 // Cadastra uma nova música no arquivo binário do acervo geral
-// pre-condicao: arquivo aberto em modo de leitura/escrita ("rb+") e o codigo fornecido nao deve existir previamente no acervo
+// pre-condicao: arquivo aberto em modo de leitura/escrita ("rb+") e o codigo da musica nao deve existir previamente no acervo
 // pos-condicao: a musica eh gravada no final do arquivo (topo) e inserida na lista encadeada, atualizando o cabecalho em disco
 void cadastrar_musica(FILE *f_musica, Musica m);
 
