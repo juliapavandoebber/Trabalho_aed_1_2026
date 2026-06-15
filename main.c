@@ -9,9 +9,12 @@
 
 int main(){
     int menu, leitura_de_numeros;
+    FILE *f_musica = NULL;
+    FILE *f_playlist = NULL;
+    FILE *f_faixa = NULL;
     
     iniciar_musica();
-    iniciar_playlist();
+    iniciar_playlists();
     iniciar_faixa();
 
     do{
@@ -44,59 +47,170 @@ int main(){
             case 0:
                 printf ("Finalizando programa...\n");
                 break;
-            case 1:
-                cadastrarLivro();
+                
+            case 1: {
+                Musica m;
+                printf("Digite o codigo da musica: ");
+                scanf("%d%*c", &m.codigo);
+                
+                printf("Digite o titulo da musica: ");
+                fgets(m.titulo, sizeof(m.titulo), stdin);
+                m.titulo[strcspn(m.titulo, "\n")] = '\0';
+                
+                printf("Digite o artista: ");
+                fgets(m.artista, sizeof(m.artista), stdin);
+                m.artista[strcspn(m.artista, "\n")] = '\0';
+                
+                printf("Digite o ano de lancamento: ");
+                scanf("%d%*c", &m.ano);
+                
+                f_musica = abrir_arquivo_musica("rb+");
+                if (f_musica != NULL) {
+                    cadastrar_musica(f_musica, m);
+                    fclose(f_musica);
+                } else {
+                    printf("Erro ao abrir arquivo de musicas.\n");
+                }
                 break;
+            }
+            
             case 2: {
-                int buscar;
-                printf ("Digite o codigo do livro para buscar as informaçoes");
-                scanf ("%d%*c", &buscar);
-                imprimirLivro(buscar);
+                int id_musica;
+                printf("Digite o codigo da musica para buscar: ");
+                scanf("%d%*c", &id_musica);
+                
+                f_musica = abrir_arquivo_musica("rb");
+                if (f_musica != NULL) {
+                    imprimir_dados_musica(f_musica, id_musica);
+                    fclose(f_musica);
+                } else {
+                    printf("Erro ao abrir arquivo de musicas.\n");
+                }
                 break;
             }
-            case 3:{
-                char titulo_buscar [51];
-                printf ("Digite o titulo do livro para buscar as informaçoes");
-                fgets(titulo_buscar, sizeof(titulo_buscar), stdin);
-                titulo_buscar[strcspn(titulo_buscar, "\n")] = '\0';
-                buscarLivroPorTitulo(titulo_buscar);
+            
+            case 3: {
+                f_musica = abrir_arquivo_musica("rb");
+                if (f_musica != NULL) {
+                    listar_acervo(f_musica);
+                    fclose(f_musica);
+                } else {
+                    printf("Erro ao abrir arquivo de musicas.\n");
+                }
                 break;
             }
-            case 4:
-                listarLivros();
+            
+            case 4: {
+                int codigo;
+                char titulo[51];
+                
+                printf("Digite o codigo da playlist: ");
+                scanf("%d%*c", &codigo);
+                
+                printf("Digite o titulo da playlist: ");
+                fgets(titulo, sizeof(titulo), stdin);
+                titulo[strcspn(titulo, "\n")] = '\0';
+                
+                f_playlist = abrir_arquivo_playlist("rb+");
+                if (f_playlist != NULL) {
+                    criar_playlist(f_playlist, codigo, titulo);
+                    fclose(f_playlist);
+                } else {
+                    printf("Erro ao abrir arquivo de playlists.\n");
+                }
                 break;
+            }
+            
             case 5: {
-                int qnt = contarTotalLivros();
-                int titulos = contarTitulosCadastrado();
-                printf("Total de livros cadastrados: %d\n", qnt);
-                printf("Total de titulos cadastrados: %d\n", titulos);
+                int id_musica, id_playlist;
+                printf("Digite o codigo da playlist: ");
+                scanf("%d%*c", &id_playlist);
+                printf("Digite o codigo da musica: ");
+                scanf("%d%*c", &id_musica);
+                
+                f_playlist = abrir_arquivo_playlist("rb+");
+                f_musica = abrir_arquivo_musica("rb+");
+                f_faixa = fopen("faixa.bin", "rb+");
+                
+                if (f_playlist && f_musica && f_faixa) {
+                    adicionar_na_playlist_fim(f_playlist, f_faixa, f_musica, id_playlist, id_musica);
+                } else {
+                    printf("Erro ao abrir os arquivos necessarios.\n");
+                }
+                
+                if(f_playlist) fclose(f_playlist);
+                if(f_musica) fclose(f_musica);
+                if(f_faixa) fclose(f_faixa);
                 break;
             }
+            
             case 6: {
-                Cadastrar_user();
+                int id_musica, id_playlist;
+                printf("Digite o codigo da playlist: ");
+                scanf("%d%*c", &id_playlist);
+                printf("Digite o codigo da musica a ser removida: ");
+                scanf("%d%*c", &id_musica);
+                
+                f_playlist = abrir_arquivo_playlist("rb+");
+                f_faixa = fopen("faixa.bin", "rb+");
+                
+                if (f_playlist && f_faixa) {
+                    remover_da_playlist(f_playlist, f_faixa, id_playlist, id_musica);
+                } else {
+                    printf("Erro ao abrir os arquivos necessarios.\n");
+                }
+                
+                if(f_playlist) fclose(f_playlist);
+                if(f_faixa) fclose(f_faixa);
                 break;
             }
+            
             case 7: {
-                cadastrarEmprestimo();
+                int id_playlist;
+                printf("Digite o codigo da playlist: ");
+                scanf("%d%*c", &id_playlist);
+                
+                f_playlist = abrir_arquivo_playlist("rb");
+                f_faixa = fopen("faixa.bin", "rb");
+                f_musica = abrir_arquivo_musica("rb");
+                
+                if (f_playlist && f_faixa && f_musica) {
+                    imprimir_playlist_especifica(f_playlist, f_faixa, f_musica, id_playlist);
+                } else {
+                    printf("Erro ao abrir os arquivos necessarios.\n");
+                }
+                
+                if(f_playlist) fclose(f_playlist);
+                if(f_faixa) fclose(f_faixa);
+                if(f_musica) fclose(f_musica);
                 break;
             }
+            
             case 8: {
-                cadastrarDevolucao();
+                f_playlist = abrir_arquivo_playlist("rb");
+                if (f_playlist != NULL) {
+                    imprimir_lista_playlists(f_playlist);
+                    fclose(f_playlist);
+                } else {
+                    printf("Erro ao abrir arquivo de playlists.\n");
+                }
                 break;
             }
+            
             case 9: {
-                listarEmprestimo();
-                break;
-            }
-            case 10:{
                 char nome_arquivo[100];
                 printf("Digite o nome do arquivo a ser carregado: ");
                 fgets(nome_arquivo, sizeof(nome_arquivo), stdin);
                 nome_arquivo[strcspn(nome_arquivo, "\n")] = '\0';
-                carregarArquivoTexto(nome_arquivo);
-                atualizarExemplaresAposCarregamento();
+                printf("Funcao de carregar arquivo chamada para %s!\n", nome_arquivo);
                 break;
             }
+            
+            case 10: {
+                printf("Funcao de imprimir nos livres chamada!\n");
+                break;
+            }
+            
             default:
                 printf ("Opcao invalida!\n");
                 break;

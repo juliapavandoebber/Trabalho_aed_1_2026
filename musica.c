@@ -134,13 +134,9 @@ void cadastrar_musica(FILE *f_musica, Musica m){
     }
 
     CabecalhoMusica cab = ler_cabecalho_musica(f_musica);
-
     long pos = cab.topo;
-
     m.prox = cab.cabeca;
-
     escrever_musica(f_musica, pos, m);
-
     cab.cabeca = pos;
     cab.topo++;
 
@@ -173,7 +169,6 @@ void listar_acervo(FILE *f_musica){
 
     while(atual != NULO){
         Musica m = ler_musica(f_musica, atual);
-
         printf("Codigo: %d\n", m.codigo);
         printf("Titulo: %s\n", m.titulo);
         printf("Artista: %s\n", m.artista);

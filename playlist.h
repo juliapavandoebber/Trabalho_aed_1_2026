@@ -6,13 +6,11 @@
 #define ARQUIVO_PLAYLIST "playlist.bin"
 #define NULO -1
 
-// Estrutura de cabeçalho do arquivo de playlists (no início do arquivo)
 typedef struct {
     long cabeca; // Posição (byte) da primeira playlist do sistema
     long topo;   // Primeira posição livre (fim do arquivo) para novas playlists
 } CabecalhoPlaylist;
 
-// Estrutura do registro de Playlist
 typedef struct {
     int codigo;                       // Identificador único da playlist
     char titulo[51];                  // Título da playlist (máximo 50 caracteres + '\0')

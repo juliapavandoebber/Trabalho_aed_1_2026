@@ -6,13 +6,11 @@
 #define ARQUIVO_FAIXA "faixa.bin"
 #define NULO -1
 
-// Estrutura de cabeçalho do arquivo de faixas (no início do arquivo)
 typedef struct {
-    long topo;          // Primeira posição livre no fim do arquivo (EOF físico)
+    long topo;          // Primeira posição livre no fim do arquivo
     long lista_livres;  // Posição da cabeça da lista de nós deletados/livres
 } CabecalhoFaixa;
 
-// Estrutura do registro de nó de faixa musical
 typedef struct {
     int codigo_musica;  // Código da música correspondente no acervo geral
     long prox;          // Posição da próxima faixa pertencente a esta playlist

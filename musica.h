@@ -5,7 +5,6 @@
 #define NULO -1
 #include <stdio.h>
 
-// Cabeçalho do arquivo binário de músicas
 typedef struct {
     long cabeca; // Posição da primeira música do acervo
     long topo;   // Primeira posição livre no final do arquivo
