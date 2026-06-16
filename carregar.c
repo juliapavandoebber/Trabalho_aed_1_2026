@@ -36,7 +36,6 @@ void carregarArquivoTexto(const char *nome_arquivo) {
         
         linha[strcspn(linha, "\n")] = '\0';
 
-        // Pula linhas vazias
         if (strlen(linha) == 0) continue;
         
         char *token = strtok(linha, ";");
@@ -62,8 +61,28 @@ void carregarArquivoTexto(const char *nome_arquivo) {
             criar_playlist(f_playlist, cod, titulo);
             printf("[Linha %d] Playlist '%s' carregada.\n", linha_atual, titulo);
         }
+        else if (strcmp(token, "I") == 0) {
+            char *posicao = strtok(NULL, ";");
+            int cod_playlist = atoi(strtok(NULL, ";"));
+            int cod_musica = atoi(strtok(NULL, ";"));
+            
+            if (strcmp(posicao, "I") == 0) {
+                adicionar_na_playlist_inicio(f_playlist, f_faixa, f_musica, cod_playlist, cod_musica);
+                printf("[Linha %d] Musica %d adicionada no INICIO da playlist %d.\n", linha_atual, cod_musica, cod_playlist);
+            } else if (strcmp(posicao, "F") == 0) {
+                adicionar_na_playlist_fim(f_playlist, f_faixa, f_musica, cod_playlist, cod_musica);
+                printf("[Linha %d] Musica %d adicionada no FIM da playlist %d.\n", linha_atual, cod_musica, cod_playlist);
+            }
+        }
+        else if (strcmp(token, "R") == 0) {
+            int cod_playlist = atoi(strtok(NULL, ";"));
+            int cod_musica = atoi(strtok(NULL, ";"));
+            
+            remover_da_playlist(f_playlist, f_faixa, cod_playlist, cod_musica);
+            printf("[Linha %d] Comando de remocao: Musica %d da playlist %d.\n", linha_atual, cod_musica, cod_playlist);
+        }
         else {
-            printf("[Linha %d] Comando desconhecido ignorado.\n", linha_atual);
+            printf("[Linha %d] Comando '%s' desconhecido ignorado.\n", linha_atual, token);
         }
     }
 
