@@ -170,7 +170,7 @@ int main(){
                 scanf("%d%*c", &id_musica);
                 
                 f_playlist = abrir_arquivo_playlist("rb+");
-                f_faixa = fopen("faixa.bin", "rb+");
+                f_faixa = abrir_arquivo_faixas("rb+"); // CORREÇÃO: Usando a sua função padronizada
                 
                 if (f_playlist && f_faixa) {
                     remover_da_playlist(f_playlist, f_faixa, id_playlist, id_musica);
@@ -189,7 +189,7 @@ int main(){
                 scanf("%d%*c", &id_playlist);
                 
                 f_playlist = abrir_arquivo_playlist("rb");
-                f_faixa = fopen("faixa.bin", "rb");
+                f_faixa = abrir_arquivo_faixas("rb");
                 f_musica = abrir_arquivo_musica("rb");
                 
                 if (f_playlist && f_faixa && f_musica) {
@@ -217,15 +217,22 @@ int main(){
             
             case 10: {
                 char nome_arquivo[100];
-                printf("Digite o nome do arquivo a ser carregado: ");
+                printf("Digite o nome do arquivo texto a ser carregado: ");
                 fgets(nome_arquivo, sizeof(nome_arquivo), stdin);
                 nome_arquivo[strcspn(nome_arquivo, "\n")] = '\0';
-                printf("Funcao de carregar arquivo chamada para %s!\n", nome_arquivo);
+                
+                carregarArquivoTexto(nome_arquivo);
                 break;
             }
             
             case 11: {
-                printf("Funcao de imprimir nos livres chamada!\n");
+                f_faixa = abrir_arquivo_faixas("rb");
+                if (f_faixa != NULL) {
+                    imprimir_nos_livres(f_faixa);
+                    fclose(f_faixa);
+                } else {
+                    printf("Erro ao abrir arquivo de faixas.\n");
+                }
                 break;
             }
             
