@@ -15,21 +15,22 @@ int main(){
     
     iniciar_musica();
     iniciar_playlists();
-    iniciar_faixa();
+    iniciar_faixas();
 
     do{
         printf ("\n\n=============================================\n");
         printf ("Escolha uma das opcoes: \n");
-        printf ("\t1 - Cadastrar música\n");
-        printf ("\t2 - Imprimir dados da música\n");
+        printf ("\t1 - Cadastrar musica\n");
+        printf ("\t2 - Imprimir dados da musica\n");
         printf ("\t3 - Listar Acervo\n");
         printf ("\t4 - Criar playlist\n");
-        printf ("\t5 - Adicionar música do acervo no final de uma playlist\n");
-        printf ("\t6 - Remover música da playlist\n");
-        printf ("\t7 - Imprimir as músicas de uma playlist específica\n");
-        printf ("\t8 - Imprimir lista de playlist\n");
-        printf ("\t9 - Carregar arquivos\n");
-        printf ("\t10 - Imprimir nós livres\n");
+        printf ("\t5 - Adicionar musica do acervo no começo de uma playlist\n");
+        printf ("\t6 - Adicionar musica do acervo no final de uma playlist\n");
+        printf ("\t7 - Remover musica da playlist\n");
+        printf ("\t8 - Imprimir as musicas de uma playlist especifica\n");
+        printf ("\t9 - Imprimir lista de playlist\n");
+        printf ("\t10 - Carregar arquivos\n");
+        printf ("\t11 - Imprimir nos livres\n");
         printf ("\t0 - Sair\n");
         printf ("=============================================\n\n");
 
@@ -122,29 +123,46 @@ int main(){
             }
             
             case 5: {
-                int id_musica, id_playlist;
-                printf("Digite o codigo da playlist: ");
-                scanf("%d%*c", &id_playlist);
-                printf("Digite o codigo da musica: ");
-                scanf("%d%*c", &id_musica);
-                
-                f_playlist = abrir_arquivo_playlist("rb+");
-                f_musica = abrir_arquivo_musica("rb+");
-                f_faixa = fopen("faixa.bin", "rb+");
-                
-                if (f_playlist && f_musica && f_faixa) {
-                    adicionar_na_playlist_fim(f_playlist, f_faixa, f_musica, id_playlist, id_musica);
-                } else {
-                    printf("Erro ao abrir os arquivos necessarios.\n");
-                }
-                
-                if(f_playlist) fclose(f_playlist);
-                if(f_musica) fclose(f_musica);
-                if(f_faixa) fclose(f_faixa);
+                int cod_playlist, cod_musica;
+
+                printf("Codigo da playlist: ");
+                scanf("%d", &cod_playlist);
+
+                printf("Codigo da musica: ");
+                scanf("%d", &cod_musica);
+
+                adicionar_na_playlist_inicio(
+                    f_playlist,
+                    f_faixa,
+                    f_musica,
+                    cod_playlist,
+                    cod_musica
+                );
+
                 break;
             }
             
             case 6: {
+                int cod_playlist, cod_musica;
+
+                printf("Codigo da playlist: ");
+                scanf("%d", &cod_playlist);
+
+                printf("Codigo da musica: ");
+                scanf("%d", &cod_musica);
+
+                adicionar_na_playlist_fim(
+                    f_playlist,
+                    f_faixa,
+                    f_musica,
+                    cod_playlist,
+                    cod_musica
+                );
+
+                break;
+            }
+
+            case 7: {
                 int id_musica, id_playlist;
                 printf("Digite o codigo da playlist: ");
                 scanf("%d%*c", &id_playlist);
@@ -165,7 +183,7 @@ int main(){
                 break;
             }
             
-            case 7: {
+            case 8: {
                 int id_playlist;
                 printf("Digite o codigo da playlist: ");
                 scanf("%d%*c", &id_playlist);
@@ -186,7 +204,7 @@ int main(){
                 break;
             }
             
-            case 8: {
+            case 9: {
                 f_playlist = abrir_arquivo_playlist("rb");
                 if (f_playlist != NULL) {
                     imprimir_lista_playlists(f_playlist);
@@ -197,7 +215,7 @@ int main(){
                 break;
             }
             
-            case 9: {
+            case 10: {
                 char nome_arquivo[100];
                 printf("Digite o nome do arquivo a ser carregado: ");
                 fgets(nome_arquivo, sizeof(nome_arquivo), stdin);
@@ -206,7 +224,7 @@ int main(){
                 break;
             }
             
-            case 10: {
+            case 11: {
                 printf("Funcao de imprimir nos livres chamada!\n");
                 break;
             }

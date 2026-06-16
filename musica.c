@@ -41,7 +41,7 @@ void iniciar_musica(){
 void criar_lista_vazia_musica(FILE* f_musica){
     CabecalhoMusica cab;
     cab.cabeca = NULO;
-    cab.topo = 0;
+    cab.topo = sizeof(CabecalhoMusica);
 
     fseek(f_musica, 0, SEEK_SET);
     fwrite(&cab, sizeof(CabecalhoMusica), 1, f_musica);
@@ -73,11 +73,7 @@ void escrever_cabecalho_musica(FILE *f_musica, CabecalhoMusica cab){
 Musica ler_musica(FILE *f_musica, long pos){
     Musica m;
 
-    fseek(
-        f_musica,
-        sizeof(CabecalhoMusica) + pos * sizeof(Musica),
-        SEEK_SET
-    );
+    fseek(f_musica, pos, SEEK_SET);
 
     fread(&m, sizeof(Musica), 1, f_musica);
 
@@ -88,18 +84,10 @@ Musica ler_musica(FILE *f_musica, long pos){
 //pre-condicao: arquivo aberto para escrita e posicao valida
 //pos-condicao: a musica eh gravada na posicao informada
 void escrever_musica(FILE *f_musica, long pos, Musica m){
-    fseek(
-        f_musica, 
-        sizeof(CabecalhoMusica) + pos * sizeof(Musica),
-        SEEK_SET
-    );
-
+    fseek(f_musica, pos, SEEK_SET);
     fwrite(&m, sizeof(Musica), 1, f_musica);
 }
 
-void cadastrar_musica(FILE *f_musica, Musica m){
-
-}
 
 // Localiza uma música pelo código e copia seus dados para uma estrutura em memória
 // pre-condicao: arquivo aberto para leitura e ponteiro 'saida' valido
@@ -135,10 +123,12 @@ void cadastrar_musica(FILE *f_musica, Musica m){
 
     CabecalhoMusica cab = ler_cabecalho_musica(f_musica);
     long pos = cab.topo;
+
     m.prox = cab.cabeca;
+
     escrever_musica(f_musica, pos, m);
     cab.cabeca = pos;
-    cab.topo++;
+    cab.topo += sizeof(Musica);
 
     escrever_cabecalho_musica(f_musica, cab);
 }
